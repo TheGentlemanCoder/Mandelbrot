@@ -1,51 +1,55 @@
 package com.greyhounds.math;
-import com.greyhounds.gui.Window;
-/**
- * Created by nicholas and micah on 2/4/17.
- */
 
 import java.math.BigDecimal;
-import java.awt.*;
+import java.awt.Color;
 
-/**
- *  f(c)=
- */
 public class EscapeCalculator {
-    int x = 0;
-    int y = 0;
-    float velocity;
-    private BigDecimal two = new BigDecimal(2);
-    private ComplexNumber c = new ComplexNumber(BigDecimal.ONE, two);
-
-
-
-    public Color calculate(ComplexNumber number) {
-        ComplexNumber iteratedNumber = number;
-        for(int i = 0;i< 10;i++){
-            iteratedNumber = iteratedNumber.square();
-            iteratedNumber = iteratedNumber.addition(c);
+        private int functionIterations;
+        private BigDecimal lowerMandelbrotBound = new BigDecimal(0.5);
+        private BigDecimal squareOfMandelbrotEscapeDistance = new BigDecimal(4);
+        private BigDecimal mandelbrotEscapeDistance = new BigDecimal(2);
+        
+        public EscapeCalculator(int functionIterations, int zoom) {
+                this.functionIterations = functionIterations;
         }
-
-        if (iteratedNumber.getReal().compareTo(number.getReal()) < 0 &&
-                iteratedNumber.getImaginary().compareTo(number.getImaginary()) < 0) {
-            return Color.BLACK;
-        } else {
-            return Color.WHITE;
+        
+        public void setFunctionIterationsTo(int newFunctionIterations) {
+                this.functionIterations = newFunctionIterations;
         }
-    }
-
-    public ComplexNumber scale(int x, int y) {
-        BigDecimal bigX = new BigDecimal(x);
-        BigDecimal bigY = new BigDecimal(y);
-
-        BigDecimal zoom = new BigDecimal(500);
-
-        BigDecimal halfWidth = new BigDecimal(-Window.getScreenWidth()/2);
-        BigDecimal halfHeight = new BigDecimal(-Window.getScreenHeight()/2);
-
-        BigDecimal real = halfWidth.divide(two).add(zoom.multiply(bigX));
-        BigDecimal imaginary = halfHeight.divide(two).add(zoom.multiply(bigY));
-
-        return new ComplexNumber(real, imaginary);
-    }
+        
+        public Color getMandelbrotColorFor(ComplexNumber coordinate) {
+                Color coordinateColor;
+                if (coordinate.getReal().compareTo(mandelbrotEscapeDistance) == 1 ||
+                    coordinate.getImaginary().compareTo(mandelbrotEscapeDistance) == 1) {
+                        coordinateColor = Color.WHITE;
+                } else {
+                        ComplexNumber iteratedCoordinate = getIteratedCoordinateFrom(coordinate);
+                        coordinateColor = getColorFrom(iteratedCoordinate);
+                }
+                
+                return coordinateColor;
+        }
+        
+        private ComplexNumber getIteratedCoordinateFrom(ComplexNumber coordinate) {
+                ComplexNumber iteratedNumber = coordinate;
+                
+                for (int i = 0; i < functionIterations; i++) {
+                    iteratedNumber = iteratedNumber.square().add(coordinate);
+                    if (iteratedNumber.getReal().compareTo(mandelbrotEscapeDistance) == 1||
+                        iteratedNumber.getImaginary().compareTo(mandelbrotEscapeDistance) == 1) {
+                        break;
+                    }
+                }
+                
+                return iteratedNumber;
+        }
+        
+        private Color getColorFrom(ComplexNumber coordinate) { 
+                BigDecimal squareOfDistanceFromOrigin = coordinate.getReal().pow(2).add(coordinate.getImaginary().pow(2));
+                if (squareOfDistanceFromOrigin.compareTo(squareOfMandelbrotEscapeDistance) == 1) {
+                        return Color.WHITE;
+                } else {
+                        return Color.BLACK;
+                }
+        }
 }

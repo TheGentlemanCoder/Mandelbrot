@@ -16,6 +16,11 @@ public class ComplexNumber {
     }
 
     public ComplexNumber square() {
+        // z = a + bi
+        // z^2 = (a + bi)(a + bi)
+        //     =  a^2 + 2abi + (b^2)(i^2)
+        //     =  a^2 + 2abi + (b^2)(-1)
+        // z^2 =  (a^2 - b^2) + 2abi
         BigDecimal a = real.multiply(real).subtract(imaginary.multiply(imaginary));
         BigDecimal b = real.multiply(imaginary).multiply(new BigDecimal(2));
 
@@ -32,17 +37,20 @@ public class ComplexNumber {
         return imaginary;
     }
 
-    public void setReal(BigDecimal x) {
-        real = x;
-    }
-
-    public void setImaginary(BigDecimal y){
-        imaginary = y;
-    }
-
-    public ComplexNumber addition(ComplexNumber z){
+    public ComplexNumber add(ComplexNumber z) {
         real = real.add(z.getReal());
         imaginary = imaginary.add(z.getImaginary());
         return new ComplexNumber(real, imaginary);
     }
+    
+    public ComplexNumber subtract(ComplexNumber z) {
+        real = real.subtract(z.getReal());
+        imaginary = imaginary.subtract(z.getImaginary());
+        return new ComplexNumber(real, imaginary);
+    }
+    
+    public BigDecimal getRadiusWithPrecision(int decimalsOfPrecision) {           
+        BigDecimal distanceFromOrigin = BigMath.sqrt(real.pow(2).add(imaginary.pow(2)), decimalsOfPrecision);
+        return distanceFromOrigin;
+   }
 }
